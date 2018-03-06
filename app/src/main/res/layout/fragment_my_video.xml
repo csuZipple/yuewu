@@ -5,6 +5,13 @@
     tools:context="zippler.cn.yuewu.activity.MyVideoFragment">
 
 
+    <ImageView
+        android:id="@+id/none_img_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/n"
+        android:contentDescription="@string/app_name" />
+
     <!--使用recyclerview来做成瀑布流布局  视频预览-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_video_recycler_view"

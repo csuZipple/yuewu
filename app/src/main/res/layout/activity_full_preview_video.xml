@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_full_preview_video"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="zippler.cn.yuewu.activity.FullPreviewVideoActivity">
+
+    <VideoView
+        android:id="@+id/video_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <ImageView
+        android:translationZ="10dp"
+        android:id="@+id/preview_video_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:transitionName="videoImg"
+
+        android:contentDescription="@string/app_name" />
+
+
+</RelativeLayout>

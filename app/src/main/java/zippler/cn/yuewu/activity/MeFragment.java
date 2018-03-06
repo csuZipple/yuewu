@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,6 @@ import android.widget.TextView;
 
 import zippler.cn.yuewu.R;
 import zippler.cn.yuewu.adapter.MeViewPagerAdapter;
-import zippler.cn.yuewu.component.NoPreloadViewPager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,7 +21,8 @@ import zippler.cn.yuewu.component.NoPreloadViewPager;
 public class MeFragment extends Fragment implements View.OnClickListener {
 
     private TabLayout tabLayout;
-    private NoPreloadViewPager viewPager;
+//    private NoPreloadViewPager viewPager;
+    private ViewPager viewPager;
     private ImageButton more;
     private ImageButton settings;
     private TextView username;
@@ -45,7 +46,8 @@ public class MeFragment extends Fragment implements View.OnClickListener {
         //为两者设置点击事件
 
         tabLayout = (TabLayout) view.findViewById(R.id.me_tab_layout);
-        viewPager = (NoPreloadViewPager) view.findViewById(R.id.me_view_pager);
+//        viewPager = (NoPreloadViewPager) view.findViewById(R.id.me_view_pager);
+        viewPager = (ViewPager) view.findViewById(R.id.me_view_pager);
 
         viewPager.setAdapter(new MeViewPagerAdapter(getChildFragmentManager()));//getChildFragmentManager
 

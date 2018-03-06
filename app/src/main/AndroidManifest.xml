@@ -35,7 +35,9 @@
         <activity android:name=".activity.PopRecordActivity" />
         <activity android:name=".activity.SettingsActivity" />
         <activity android:name=".activity.UserInfoActivity" />
-        <activity android:name=".activity.PreviewRecordVideoActivity"></activity>
+        <activity android:name=".activity.PreviewRecordVideoActivity" />
+        <activity android:name=".activity.DeployVideoActivity" />
+        <activity android:name=".activity.FullPreviewVideoActivity"></activity>
     </application>
 
 </manifest>

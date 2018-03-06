@@ -7,12 +7,13 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import zippler.cn.yuewu.R;
-import zippler.cn.yuewu.adapter.MyVideoPreviewAdapter;
+import zippler.cn.yuewu.adapter.MyFavoriteVideoPreviewAdapter;
 import zippler.cn.yuewu.util.GridSpacingItemDecoration;
 
 /**
@@ -22,7 +23,7 @@ import zippler.cn.yuewu.util.GridSpacingItemDecoration;
  */
 public class MyFavoriteFragment extends Fragment {
     private RecyclerView recyclerView ;
-
+    private ImageView imageView ;
 
     public MyFavoriteFragment() {
         // Required empty public constructor
@@ -37,19 +38,28 @@ public class MyFavoriteFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_my_video, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.my_video_recycler_view);
+        imageView = (ImageView) view.findViewById(R.id.none_img_view);
         //设置布局管理器，用于list的排列
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);//垂直排列
         recyclerView.setLayoutManager(layoutManager);
 
              /*以下加载预览图像部分*/
-        List<Integer> imgList = new ArrayList<>();
-        imgList.add(R.drawable.m);
-        imgList.add(R.drawable.m1);
-        imgList.add(R.drawable.avatar);
+        List<String> videoList = new ArrayList<>();
+        videoList.add("android.resource://" + getActivity().getPackageName() + "/" + R.raw.v1);
+        videoList.add("android.resource://" + getActivity().getPackageName() + "/" + R.raw.v2);
+        videoList.add("android.resource://" + getActivity().getPackageName() + "/" + R.raw.v3);
+        videoList.add("android.resource://" + getActivity().getPackageName() + "/" + R.raw.v4);
 
 
         //ImageList
-        recyclerView.setAdapter(new MyVideoPreviewAdapter(imgList));
+        if (videoList.size()>0){
+            imageView.setVisibility(View.GONE);
+            recyclerView.setAdapter(new MyFavoriteVideoPreviewAdapter(getContext(),videoList));
+        }else{
+            //数据为空，显示默认ImageView
+            imageView.setVisibility(View.VISIBLE);
+        }
+
 
         int spanCount = 3; // 3 columns
         int spacing = 50; // 50px

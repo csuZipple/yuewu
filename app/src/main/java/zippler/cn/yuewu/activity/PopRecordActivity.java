@@ -124,6 +124,7 @@ public class PopRecordActivity extends BaseActivity implements TextureView.Surfa
             case R.id.recordBtn:
                 //开始录制视频
                 if (!clicked){
+                    fresh_btn.setVisibility(View.GONE);//必须设置为gone，这样才不会被点击到
                     playMusic(R.raw.di);
                     clicked=true;
                     isPause = false;
@@ -135,6 +136,7 @@ public class PopRecordActivity extends BaseActivity implements TextureView.Surfa
                     //调用录制视频逻辑
                     record();
                 }else{
+                    fresh_btn.setVisibility(View.VISIBLE);
                     playMusic(R.raw.po);
                     clicked = false;
                     recordBtn.setImageResource(0);
