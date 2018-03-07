@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -18,22 +19,28 @@
         app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.07999998">
+        app:layout_constraintVertical_bias="0.07999998"
+        tools:layout_editor_absoluteX="133dp">
 
         <zippler.cn.yuewu.component.CircleImageView
             android:id="@+id/profile_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/avatar"
-            app:civ_border_color="#FF000000"
-            app:civ_border_width="2dp" />
+            android:layout_marginTop="10dp"
+
+            />
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -56,9 +63,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:textCursorDrawable="@null"
                 android:text="个人资料"
                 android:textColor="@android:color/background_light"
-                android:textSize="24sp" />
+                android:textSize="20sp" />
 
             <Button
                 style="@style/Widget.AppCompat.Button.Colored"
@@ -71,14 +79,14 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/user_profile_item_background_color"
             android:orientation="vertical">
 
             <RelativeLayout
-                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginTop="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -133,11 +141,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="抖音号"
+                    android:text="id"
                     android:textColor="@color/user_profile_key_color"
                     android:textSize="18sp" />
 
                 <EditText
+                    android:textCursorDrawable="@null"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -187,6 +196,7 @@
                     android:textSize="18sp" />
 
                 <EditText
+                    android:textCursorDrawable="@null"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -216,6 +226,7 @@
                     android:textSize="18sp" />
 
                 <EditText
+                    android:textCursorDrawable="@null"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -245,6 +256,7 @@
                     android:textSize="18sp" />
 
                 <EditText
+                    android:textCursorDrawable="@null"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -274,6 +286,7 @@
                     android:textSize="18sp" />
 
                 <EditText
+                    android:textCursorDrawable="@null"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -309,6 +322,7 @@
                 android:textSize="18sp" />
 
             <EditText
+                android:textCursorDrawable="@null"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -329,4 +343,4 @@
                 app:srcCompat="@drawable/ic_navigate_next_black_24dp" />
         </RelativeLayout>
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout >

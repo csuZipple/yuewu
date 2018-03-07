@@ -19,6 +19,8 @@ public class MyVideoPreviewHolder  extends RecyclerView.ViewHolder {
         imageView = (ImageView) itemView.findViewById(R.id.my_video_img);
     }
 
+
+
     public ImageView getImageView() {
         return imageView;
     }

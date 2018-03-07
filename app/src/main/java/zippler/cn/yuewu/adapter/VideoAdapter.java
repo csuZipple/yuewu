@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -32,6 +33,8 @@ public class VideoAdapter extends RecyclerView.Adapter<MViewHolder> {
     private List<String> videoList;//视频路径
     private Context c;
 
+    private boolean clicked = false;
+
 
 
     public VideoAdapter(List<String> videoList,Context c) {
@@ -45,25 +48,54 @@ public class VideoAdapter extends RecyclerView.Adapter<MViewHolder> {
         final MViewHolder holder = new MViewHolder(view);
 
         //给子项注册点击事件
-        holder.getVideo().setOnClickListener(new View.OnClickListener() {
+        holder.getVideo().setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-//                holder.video.pause();
-                Log.d("VideoAdapter", "onClick: 触发视频item点击事件");
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("VideoAdapter", "onClick: 触发视频item touch事件");
+                if (holder.getVideo().isPlaying()){
+                    holder.getVideo().pause();
+                    holder.getPauseView().setVisibility(View.VISIBLE);
+                }else{
+                    holder.getVideo().setAlpha(1);
+                    holder.getImageView().setVisibility(View.GONE);//播放时确保预览图片不可见
+                    holder.getPauseView().setVisibility(View.GONE);//根据需要添加动画效果
+                    holder.getVideo().start();
+                }
+                return false;
             }
         });
+
+        holder.getImageView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("VideoAdapter", "onClick: 触发预览图item点击事件");
+                holder.getVideo().setVisibility(View.VISIBLE);
+                holder.getImageView().setVisibility(View.GONE);//播放时确保预览图片不可见
+                holder.getImageView().setTranslationZ(0);
+                holder.getPauseView().setVisibility(View.GONE);//根据需要添加动画效果
+                holder.getVideo().start();
+            }
+        });
+
+        holder.getLoveBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("VideoAdapter", "onClick: 触发love item点击事件");
+                if (!clicked){
+                    clicked = true;
+                    holder.getLoveBtn().setImageResource(R.mipmap.love_red);
+                }else{
+                    clicked = false;
+                    holder.getLoveBtn().setImageResource(R.mipmap.love_white);
+                }
+            }
+        });
+
 
         holder.getItem().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (holder.getVideo().isPlaying()){
-                    holder.getVideo().pause();
-                }else{
-                    holder.getVideo().setAlpha(1);
-                    holder.getImageView().setVisibility(View.INVISIBLE);//播放时确保图片不可见
-                    holder.getVideo().start();
-                }
-                Log.d("VideoAdapter", "onClick: 触发tem点击事件");
+                Log.d("VideoAdapter", "onClick: itemVIew");
             }
         });
 
@@ -77,7 +109,11 @@ public class VideoAdapter extends RecyclerView.Adapter<MViewHolder> {
 //        Log.d("video_info", "onBindViewHolder:视频路径检测 "+videoPath);
          VideoView v = holder.getVideo();
          ImageView image = holder.getImageView();
-        v.setVideoURI(Uri.parse(videoPath));//设置路径
+        if (videoPath.startsWith("android")){
+            v.setVideoURI(Uri.parse(videoPath));//设置路径
+        }else{
+            v.setVideoPath(videoPath);
+        }
 
         //设置视频首帧预览
         MediaMetadataRetriever media = new MediaMetadataRetriever();

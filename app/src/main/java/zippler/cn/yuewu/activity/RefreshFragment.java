@@ -50,6 +50,9 @@ public class RefreshFragment extends Fragment {
 
         /*以下加载视频部分*/
         List<String> videoList = new ArrayList<>();
+        if (getArguments()!=null&&getArguments().getString("videoPath")!=null){
+            videoList.add(getArguments().getString("videoPath"));
+        }
         videoList.add("android.resource://" + getActivity().getPackageName() + "/" + R.raw.v1);
         videoList.add("android.resource://" + getActivity().getPackageName() + "/" + R.raw.v2);
         videoList.add("android.resource://" + getActivity().getPackageName() + "/" + R.raw.v3);
@@ -97,6 +100,7 @@ public class RefreshFragment extends Fragment {
         for (int i = 0; i < map.size(); i++) {
             MViewHolder holder = (MViewHolder) map.get(i);
             holder.getImageView().setVisibility(View.VISIBLE);
+            holder.getVideo().setVisibility(View.GONE);
         }
         super.onPause();
     }

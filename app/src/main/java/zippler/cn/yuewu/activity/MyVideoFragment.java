@@ -43,6 +43,7 @@ public class MyVideoFragment extends Fragment {
 
         recyclerView = (RecyclerView) view.findViewById(R.id.my_video_recycler_view);
         imageView = (ImageView) view.findViewById(R.id.none_img_view);
+
         //设置布局管理器，用于list的排列
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);//垂直排列
         recyclerView.setLayoutManager(layoutManager);
@@ -53,7 +54,7 @@ public class MyVideoFragment extends Fragment {
         List<String> pathList = FileUtil.traverseFolder(basePath);
         if (pathList!=null&&pathList.size()>0){
             imageView.setVisibility(View.GONE);
-            recyclerView.setAdapter(new MyVideoPreviewAdapter(pathList));
+            recyclerView.setAdapter(new MyVideoPreviewAdapter(getContext()));
         }else{
             //数据为空，显示默认ImageView
             imageView.setVisibility(View.VISIBLE);

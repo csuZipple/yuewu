@@ -10,8 +10,8 @@ import android.widget.VideoView;
 import java.util.Map;
 
 import zippler.cn.yuewu.adapter.VideoAdapter;
-import zippler.cn.yuewu.util.LinerLayoutManager;
 import zippler.cn.yuewu.holders.MViewHolder;
+import zippler.cn.yuewu.util.LinerLayoutManager;
 
 import static android.content.ContentValues.TAG;
 
@@ -46,6 +46,10 @@ public class OnMyScrollListener extends RecyclerView.OnScrollListener {
 
         switch (newState){
             case 2:
+//                View view2 = layoutManager.findViewByPosition(pos);
+//                 MViewHolder mv2 = (MViewHolder) recyclerView.getChildViewHolder(view2);//获取到当前控件
+//                mv2.getVideo().setVisibility(View.GONE);
+//                mv2.getImageView().setVisibility(View.VISIBLE);
             case 0:
                 pos =layoutManager.findFirstVisibleItemPosition();
                 Log.d(TAG, "onScrollStateChanged: 00000000000   pos:"+pos);
@@ -83,16 +87,16 @@ public class OnMyScrollListener extends RecyclerView.OnScrollListener {
                 View view = layoutManager.findViewByPosition(pos);
                 final MViewHolder mv = (MViewHolder) recyclerView.getChildViewHolder(view);//获取到当前控件
                 final VideoView v =mv.getVideo();
-                v.setAlpha(1);
-
                 //播放
-
                 if (v.isPlaying()) {
                     ImageView img =mv.getImageView();
-                    img.setVisibility(View.INVISIBLE);
+                    img.setVisibility(View.GONE);
+
+                    mv.getPauseView().setVisibility(View.GONE);
                     return;
                 }
                 v.seekTo(500);
+                v.setVisibility(View.VISIBLE);
                 v.start();
 
 
@@ -100,7 +104,8 @@ public class OnMyScrollListener extends RecyclerView.OnScrollListener {
                     @Override
                     public void run() {
                             ImageView img =mv.getImageView();
-                            img.setVisibility(View.INVISIBLE);
+                            img.setVisibility(View.GONE);
+                            mv.getPauseView().setVisibility(View.GONE);
                 }
                 },500);
 
@@ -109,6 +114,7 @@ public class OnMyScrollListener extends RecyclerView.OnScrollListener {
                 v.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
+                        v.setVisibility(View.VISIBLE);
                         v.start();
                     }
                 });
@@ -116,30 +122,8 @@ public class OnMyScrollListener extends RecyclerView.OnScrollListener {
             case 1:
                 pos =layoutManager.findFirstVisibleItemPosition();
                 view = layoutManager.findViewByPosition(pos);
-
-
                 Log.d(TAG, "onScrollStateChanged: 1111111111111 pos"+pos);
 
-//                pos =((LinerLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
-//                //为前项后项设置透明度
-//                if (scrollTop){
-//                    if (pos>0){
-//                        MViewHolder vh1 = (MViewHolder) ((VideoAdapter) recyclerView.getAdapter()).getMapViewHolder().get(pos-1);//获取到当前控件
-//                        VideoView vv1 =vh1.getVideo();
-//                        vv1.setAlpha(0);
-//                    }
-//                }else{
-//                    int vhSize = ((VideoAdapter) recyclerView.getAdapter()).getMapViewHolder().size();
-//                    Log.d(TAG, "onScrollStateChanged: vh size=="+vhSize);
-//                    if (pos<size-1){
-////                        Log.d(TAG, "onScrollStateChanged: adapter..."+((VideoAdapter) recyclerView.getAdapter()).getMapViewHolder().size());
-//                        if (pos!=vhSize-1){
-//                            MViewHolder vh1 = (MViewHolder) ((VideoAdapter) recyclerView.getAdapter()).getMapViewHolder().get(pos+1);//获取到当前控件
-//                            VideoView vv1 =vh1.getVideo();
-//                            vv1.setAlpha(0);
-//                        }
-//                    }
-//                }
                 break;
         }
     }

@@ -51,6 +51,22 @@ public class MeFragment extends Fragment implements View.OnClickListener {
 
         viewPager.setAdapter(new MeViewPagerAdapter(getChildFragmentManager()));//getChildFragmentManager
 
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                  tabLayout.getTabAt(position).select();//选择相应的页面
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         TabLayout.Tab firstTab = tabLayout.getTabAt(0);
         if (firstTab!=null){
             firstTab.select();//设置首项

@@ -26,12 +26,13 @@ public class CameraActivity extends BaseActivity {
 
 
        viewPager = (NoPreloadViewPager) findViewById(R.id.view_pager);
-
         //为viewpager设置适配器
-        viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
-
+        if (getIntent().getStringExtra("videoPath")!=null){
+            viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager(),getIntent().getStringExtra("videoPath")));
+        }else{
+            viewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        }
         setTabListener(tabLayout);
-
         viewPager.setOnPageChangeListener(new NoPreloadViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

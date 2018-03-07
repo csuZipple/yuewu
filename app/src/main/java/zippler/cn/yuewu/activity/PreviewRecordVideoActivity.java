@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -34,6 +35,7 @@ public class PreviewRecordVideoActivity extends BaseActivity {
     private SeekBar seekBar;
 
     private String path;
+    private int duration;//视频时长
 
     private AlertDialog.Builder dialog;//对话框
     private Timer timer;//进度条计时器
@@ -57,6 +59,13 @@ public class PreviewRecordVideoActivity extends BaseActivity {
 
         videoView.setVideoPath(path);
 
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                duration = videoView.getDuration();
+            }
+        });
+
         init();
     }
 
@@ -76,7 +85,6 @@ public class PreviewRecordVideoActivity extends BaseActivity {
                 //取出消息携带的数据
                 Bundle data = msg.getData();
                 int currentPosition = data.getInt("currentPosition");
-                int duration = data.getInt("duration");
 
                 //设置播放进度
                 seekBar.setMax(duration);
@@ -114,6 +122,7 @@ public class PreviewRecordVideoActivity extends BaseActivity {
                                     toast("删除成功");
                                     finish();//从当前界面返回
                                 }
+                                progressDialog.dismiss();
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -128,6 +137,8 @@ public class PreviewRecordVideoActivity extends BaseActivity {
                 //跳转到发布页面
                 Intent intent = new Intent(this,DeployVideoActivity.class);
                 intent.putExtra("videoPath",path);//此路径应为裁剪后的视频路径，将裁剪前视频删除
+                Log.d(TAG, "onClick: 跳转到发布页面. length "+duration);
+                intent.putExtra("duration",duration+"");
                 startActivity(intent);
                 break;
             case R.id.back_button:
@@ -180,7 +191,7 @@ public class PreviewRecordVideoActivity extends BaseActivity {
             @Override
             public void run() {
                 int currentPosition = videoView.getCurrentPosition();
-                int duration = videoView.getDuration();
+//                int duration = videoView.getDuration();
                 Message msg = Message.obtain();
                 //把播放进度存入Message中
                 Bundle data = new Bundle();

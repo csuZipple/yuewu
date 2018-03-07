@@ -334,7 +334,7 @@ public class PopRecordActivity extends BaseActivity implements TextureView.Surfa
 
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);  // 设置视频的输出格式 为MP4
 
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT); // 设置音频的编码格式
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC); // 设置音频的编码格式
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264); // 设置视频的编码格式
 //        mediaRecorder.setVideoSize(176, 144);  // 设置视频大小
 //        mediaRecorder.setVideoSize(320, 240);  // 设置视频大小

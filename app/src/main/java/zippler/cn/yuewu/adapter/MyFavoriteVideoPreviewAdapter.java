@@ -1,6 +1,7 @@
 package zippler.cn.yuewu.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import zippler.cn.yuewu.R;
+import zippler.cn.yuewu.activity.FullPreviewVideoActivity;
 import zippler.cn.yuewu.holders.MyVideoPreviewHolder;
 
 import static android.content.ContentValues.TAG;
@@ -38,15 +40,24 @@ public class MyFavoriteVideoPreviewAdapter extends RecyclerView.Adapter<MyVideoP
     }
 
     @Override
-    public void onBindViewHolder(MyVideoPreviewHolder holder, int position) {
+    public void onBindViewHolder(MyVideoPreviewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: video子项 "+position);
-        //在这里可以设置图像
-//        holder.getImageView().setImageResource(paths.get(position));
         //设置视频首帧预览
         MediaMetadataRetriever media = new MediaMetadataRetriever();
+        Log.d(TAG, "onBindViewHolder: videoPath " + paths.get(position));
+        Log.d(TAG, "onBindViewHolder: videoPath " + Uri.parse(paths.get(position)));
         media.setDataSource(c, Uri.parse(paths.get(position)));//设置数据源
         Bitmap bitmap = media.getFrameAtTime();
         holder.getImageView().setImageBitmap(bitmap);
+
+        holder.getImageView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(c, FullPreviewVideoActivity.class);
+                intent.putExtra("videoPath",paths.get(position));
+                c.startActivity(intent);
+            }
+        });
     }
 
     @Override
