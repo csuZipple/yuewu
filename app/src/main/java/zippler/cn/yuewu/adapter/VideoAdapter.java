@@ -109,15 +109,19 @@ public class VideoAdapter extends RecyclerView.Adapter<MViewHolder> {
 //        Log.d("video_info", "onBindViewHolder:视频路径检测 "+videoPath);
          VideoView v = holder.getVideo();
          ImageView image = holder.getImageView();
-        if (videoPath.startsWith("android")){
-            v.setVideoURI(Uri.parse(videoPath));//设置路径
-        }else{
-            v.setVideoPath(videoPath);
-        }
 
         //设置视频首帧预览
         MediaMetadataRetriever media = new MediaMetadataRetriever();
-        media.setDataSource(c,Uri.parse(videoPath));//设置数据源
+        if (videoPath.startsWith("android")){
+            v.setVideoURI(Uri.parse(videoPath));//设置路径
+            media.setDataSource(c,Uri.parse(videoPath));//设置数据源
+        }else{
+            v.setVideoPath(videoPath);
+            media.setDataSource(videoPath);
+        }
+
+
+
         Bitmap bitmap = media.getFrameAtTime();
         Log.d(TAG, "onBindViewHolder: bitmap:"+bitmap.getByteCount());
         image.setImageBitmap(bitmap);

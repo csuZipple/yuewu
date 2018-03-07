@@ -1,14 +1,12 @@
 package zippler.cn.yuewu.activity;
 
 import android.app.ActivityOptions;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,52 +30,33 @@ import zippler.cn.yuewu.util.BaseActivity;
 /**
  * 视频发布页面，发布完成后跳转到个人中心
  */
-public class DeployVideoActivity extends BaseActivity {
+public class DeployVideoActivity2 extends BaseActivity {
 
     private static final String TAG = "upload";
     private ImageView videoImg ;
     private Button deploy;
     private  String videoPath;
-
-    final String outfilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "yuewu"+File.separator + "乐舞_test.mp4";
-    private ProgressDialog mProgressDialog = null;
-    private Handler handler = null;
-
-    private boolean isSuccess = false;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deploy_video);
-//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-//        StrictMode.setThreadPolicy(policy);//方便在主线程中调用
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);//方便在主线程中调用
         videoImg = (ImageView) findViewById(R.id.preview_video_img);
         deploy = (Button) findViewById(R.id.deploy_button);
+
         videoImg.setOnClickListener(this);
         assert deploy != null;
         deploy.setOnClickListener(this);
+
         videoPath = getIntent().getStringExtra("videoPath");
+
         //设置首帧预览
         MediaMetadataRetriever media = new MediaMetadataRetriever();
         media.setDataSource(videoPath);//设置数据源
         Bitmap bitmap = media.getFrameAtTime();
         videoImg.setImageBitmap(bitmap);
 
-        //另起线程
-        handler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what){
-                    case 0:
-                        mProgressDialog.dismiss();
-                        break;
-                    case 1:
-                        mProgressDialog = ProgressDialog.show(DeployVideoActivity.this, "正在上传", "loading",false);
-                        break;
-                }
-            }
-        };
     }
 
     @Override
@@ -86,24 +65,63 @@ public class DeployVideoActivity extends BaseActivity {
         switch (v.getId()){
             case R.id.deploy_button:
                 //上传至服务器
-                handler.sendEmptyMessage(1);
-                new Thread(){
-                    @Override
-                    public void run() {
-                        String audio = upload();
-                        if (audio!=null){
-                            composeVideo(audio,outfilePath);
-                            handler.sendEmptyMessage(0);
-                            Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
-                            intent1.putExtra("ms","上传成功");
-                            intent1.putExtra("videoPath",outfilePath);
-                            startActivity(intent1);
-                        }else{
-                            Log.d(TAG, "run: 上传失败了...该死的bug!!!!!!");
-                            handler.sendEmptyMessage(0);
+                        String audio;
+                        try {
+                            String jsonString = upLoadByCommonPost();
+                            if (jsonString!=null){
+                                int type = Integer.parseInt(String.valueOf(jsonString.charAt(jsonString.lastIndexOf("}")-1)));
+                                Log.d(TAG, "onClick: 上传成功");
+                                toast("上传成功");
+                                switch (type){
+                                    case 0:
+                                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"style.mp3";
+                                        break;
+                                    case 1:
+                                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"panama.mp3";
+                                        break;
+                                    case 2:
+                                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"seve.mp3";
+                                        break;
+                                    case 3:
+                                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"hongyan.mp3";
+                                        break;
+                                    default:
+                                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"seve.mp3";
+                                        break;
+                                }
+
+                                Log.d(TAG, "onClick: "+getIntent().getStringExtra("duration"));
+                                //等待返回结果
+                                final String outfilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "yuewu"+File.separator + "乐舞_test.mp4";
+                                File file = new File(audio);
+                                Log.d(TAG, "onClick: 音频文件 ： "+file.exists());
+                                File file2 = new File(videoPath);
+                                Log.d(TAG, "onClick: 视频文件 ： "+file2.exists());
+                                EpEditor.music(videoPath,audio , outfilePath, 0, 1, new OnEditorListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d(TAG, "onClick: 视频合成成功，开始跳转");
+                                        Intent intent1 = new Intent(DeployVideoActivity2.this,CameraActivity.class);
+                                        intent1.putExtra("ms","上传成功");
+                                        intent1.putExtra("videoPath",outfilePath);
+                                        startActivity(intent1);
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Log.d(TAG, "onFailure: 转换视频失败");
+                                    }
+                                    @Override
+                                    public void onProgress(float progress) {
+                                        //这里获取处理进度
+                                    }
+                                });
+                            }
+                        } catch (IOException e) {
+                            Log.d(TAG, "onClick: 上传失败");
+                            toast("上传失败");
+                            e.printStackTrace();
                         }
-                    }
-                }.start();
                 break;
             case R.id.preview_video_img:
                 //跳转至video预览
@@ -247,78 +265,5 @@ public class DeployVideoActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-
-    /**
-     * 视频上传
-     */
-    public String upload(){
-        String audio;
-        try {
-            String jsonString = upLoadByCommonPost();
-            if (jsonString!=null){
-                int type = Integer.parseInt(String.valueOf(jsonString.charAt(jsonString.lastIndexOf("}")-1)));
-                Log.d(TAG, "onClick: 上传成功");
-                switch (type){
-                    case 0:
-                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"style.mp3";
-                        break;
-                    case 1:
-                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"panama.mp3";
-                        break;
-                    case 2:
-                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"seve.mp3";
-                        break;
-                    case 3:
-                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"hongyan.mp3";
-                        break;
-                    default:
-                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"seve.mp3";
-                        break;
-                }
-
-                Log.d(TAG, "onClick: "+getIntent().getStringExtra("duration"));
-                //等待返回结果
-                File file = new File(audio);
-                Log.d(TAG, "onClick: 音频文件 ： "+file.exists());
-                File file2 = new File(videoPath);
-                Log.d(TAG, "onClick: 视频文件 ： "+file2.exists());
-
-                return audio;
-            }
-        } catch (IOException e) {
-            Log.d(TAG, "onClick: 上传失败");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    /**
-     * 合成视频
-     * @param audio 音频路径
-     * @param outfilePath 输出路径
-     */
-    public void composeVideo(String audio,String outfilePath){
-        EpEditor.music(videoPath,audio , outfilePath, 0, 1, new OnEditorListener() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "onClick: 视频合成成功，开始跳转");
-//                        Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
-//                        intent1.putExtra("ms","上传成功");
-//                        intent1.putExtra("videoPath",outfilePath);
-//                        startActivity(intent1);
-            }
-
-            @Override
-            public void onFailure() {
-                Log.d(TAG, "onFailure: 转换视频失败");
-            }
-            @Override
-            public void onProgress(float progress) {
-                //这里获取处理进度
-            }
-        });
     }
 }
