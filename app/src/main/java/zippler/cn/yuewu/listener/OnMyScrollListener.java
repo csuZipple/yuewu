@@ -132,6 +132,5 @@ public class OnMyScrollListener extends RecyclerView.OnScrollListener {
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
         scrollTop = dy>0;
-        Log.d(TAG, "onScrolled: dx:"+dx+"...dy:"+dy);
     }
 }

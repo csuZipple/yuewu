@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +39,7 @@ public class DeployVideoActivity extends BaseActivity {
     private ImageView videoImg ;
     private Button deploy;
     private  String videoPath;
+//    private ImageView loading;
 
     final String outfilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "yuewu"+File.separator + "乐舞_test.mp4";
     private ProgressDialog mProgressDialog = null;
@@ -45,15 +47,18 @@ public class DeployVideoActivity extends BaseActivity {
 
     private boolean isSuccess = false;
 
+    private String audio;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deploy_video);
-//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-//        StrictMode.setThreadPolicy(policy);//方便在主线程中调用
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);//方便在主线程中调用
         videoImg = (ImageView) findViewById(R.id.preview_video_img);
         deploy = (Button) findViewById(R.id.deploy_button);
+//        loading = (ImageView) findViewById(R.id.loading);
         videoImg.setOnClickListener(this);
         assert deploy != null;
         deploy.setOnClickListener(this);
@@ -86,24 +91,29 @@ public class DeployVideoActivity extends BaseActivity {
         switch (v.getId()){
             case R.id.deploy_button:
                 //上传至服务器
-                handler.sendEmptyMessage(1);
-                new Thread(){
+
+                final ProgressDialog dialog = ProgressDialog.show(this,
+                        "正在上传", "请稍后....", true);//创建一个进度对话框
+                new Thread(new Runnable() {//使用Runnable代码块创建了一个Thread线程
                     @Override
-                    public void run() {
-                        String audio = upload();
-                        if (audio!=null){
+                    public void run() {//run()方法中的代码将在一个单独的线程中执行
+                        // TODO Auto-generated method stub
+                        try {
+//                            Thread.sleep(5000);//模拟一个耗时5秒的操作
+                            audio = upload();
                             composeVideo(audio,outfilePath);
-                            handler.sendEmptyMessage(0);
-                            Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
-                            intent1.putExtra("ms","上传成功");
-                            intent1.putExtra("videoPath",outfilePath);
-                            startActivity(intent1);
-                        }else{
-                            Log.d(TAG, "run: 上传失败了...该死的bug!!!!!!");
-                            handler.sendEmptyMessage(0);
+//                            Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
+//                            intent1.putExtra("ms","上传成功");
+//                            intent1.putExtra("vp",outfilePath);
+//                            startActivity(intent1);
+                            dialog.dismiss();//5秒钟后，调用dismiss方法关闭进度对话框
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                            e.printStackTrace();
                         }
                     }
-                }.start();
+                }).start();
+
                 break;
             case R.id.preview_video_img:
                 //跳转至video预览
@@ -300,15 +310,29 @@ public class DeployVideoActivity extends BaseActivity {
      * @param audio 音频路径
      * @param outfilePath 输出路径
      */
-    public void composeVideo(String audio,String outfilePath){
+    public void composeVideo(String audio, final String outfilePath){
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
         EpEditor.music(videoPath,audio , outfilePath, 0, 1, new OnEditorListener() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "onClick: 视频合成成功，开始跳转");
-//                        Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
-//                        intent1.putExtra("ms","上传成功");
-//                        intent1.putExtra("videoPath",outfilePath);
-//                        startActivity(intent1);
+                            Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
+                            intent1.putExtra("ms","上传成功");
+                            intent1.putExtra("vp",outfilePath);
+                            startActivity(intent1);
             }
 
             @Override
@@ -317,6 +341,7 @@ public class DeployVideoActivity extends BaseActivity {
             }
             @Override
             public void onProgress(float progress) {
+                Log.d(TAG, "onProgress: "+progress);
                 //这里获取处理进度
             }
         });

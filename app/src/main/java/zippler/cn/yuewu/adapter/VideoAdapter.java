@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.VideoView;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,24 +107,26 @@ public class VideoAdapter extends RecyclerView.Adapter<MViewHolder> {
     @Override
     public void onBindViewHolder(final MViewHolder holder, int position) {
         String videoPath = videoList.get(position);
-//        Log.d("video_info", "onBindViewHolder:视频路径检测 "+videoPath);
+        Log.d(TAG, "onBindViewHolder:视频路径检测 "+videoPath);
          VideoView v = holder.getVideo();
          ImageView image = holder.getImageView();
 
         //设置视频首帧预览
         MediaMetadataRetriever media = new MediaMetadataRetriever();
-        if (videoPath.startsWith("android")){
+        if (videoPath.contains("android")){
             v.setVideoURI(Uri.parse(videoPath));//设置路径
             media.setDataSource(c,Uri.parse(videoPath));//设置数据源
         }else{
-            v.setVideoPath(videoPath);
-            media.setDataSource(videoPath);
+            if (new File(videoPath).exists()){
+                v.setVideoPath(videoPath);
+                media.setDataSource(videoPath);
+            }
+            Log.d(TAG, "onBindViewHolder: 当前视频不存在");
         }
 
 
 
         Bitmap bitmap = media.getFrameAtTime();
-        Log.d(TAG, "onBindViewHolder: bitmap:"+bitmap.getByteCount());
         image.setImageBitmap(bitmap);
 
         //保存view holder

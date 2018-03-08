@@ -7,6 +7,14 @@
     android:background="#212121"
     tools:context="zippler.cn.yuewu.activity.DeployVideoActivity">
 
+    <!--<zippler.cn.yuewu.component.MyGifView-->
+        <!--android:id="@+id/loading"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:translationZ="10dp"-->
+        <!--android:contentDescription="@string/app_name" />-->
+
     <!--发布视频-->
     <RelativeLayout
         android:id="@+id/deploy_top_layout"
