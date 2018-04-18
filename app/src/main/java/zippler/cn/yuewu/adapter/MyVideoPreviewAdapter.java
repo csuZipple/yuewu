@@ -1,6 +1,7 @@
 package zippler.cn.yuewu.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.util.List;
 
 import zippler.cn.yuewu.R;
+import zippler.cn.yuewu.activity.FullPreviewVideoActivity;
 import zippler.cn.yuewu.holders.MyVideoPreviewHolder;
 import zippler.cn.yuewu.util.FileUtil;
 
@@ -60,16 +62,32 @@ public class MyVideoPreviewAdapter extends RecyclerView.Adapter<MyVideoPreviewHo
 
         final int pos = position;
         ImageView img = holder.getImageView();
+
+
+        holder.getImageView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(c, FullPreviewVideoActivity.class);
+                if (videoList != null) {
+                    intent.putExtra("videoPath",videoList.get(position));
+                    c.startActivity(intent);
+                }
+            }
+        });
+
+
         img.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View v, MotionEvent event) {
                 GestureDetector detector = new GestureDetector(c, new GestureDetector.SimpleOnGestureListener(){
                     @Override
                     public void onLongPress(MotionEvent e) {
-                        super.onLongPress(e);
-                        FileUtil.deleteFile(videoList.get(pos));
+                        if (videoList != null) {
+                            FileUtil.deleteFile(videoList.get(pos));
+                        }
                         Toast.makeText(c,"长按执行删除操作..",Toast.LENGTH_SHORT).show();
                         MyVideoPreviewAdapter.this.notifyDataSetChanged();//刷新整个recycleview
+                        super.onLongPress(e);
                     }
                 });
 

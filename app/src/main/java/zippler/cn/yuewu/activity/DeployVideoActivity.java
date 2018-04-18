@@ -25,8 +25,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import VideoHandle.EpEditor;
-import VideoHandle.OnEditorListener;
 import zippler.cn.yuewu.R;
 import zippler.cn.yuewu.util.BaseActivity;
 
@@ -93,19 +91,19 @@ public class DeployVideoActivity extends BaseActivity {
                 //上传至服务器
 
                 final ProgressDialog dialog = ProgressDialog.show(this,
-                        "正在上传", "请稍后....", true);//创建一个进度对话框
+                        "正在发布", "请稍后....", true);//创建一个进度对话框
                 new Thread(new Runnable() {//使用Runnable代码块创建了一个Thread线程
                     @Override
                     public void run() {//run()方法中的代码将在一个单独的线程中执行
                         // TODO Auto-generated method stub
                         try {
-//                            Thread.sleep(5000);//模拟一个耗时5秒的操作
-                            audio = upload();
-                            composeVideo(audio,outfilePath);
-//                            Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
-//                            intent1.putExtra("ms","上传成功");
-//                            intent1.putExtra("vp",outfilePath);
-//                            startActivity(intent1);
+                            Thread.sleep(5000);//模拟一个耗时5秒的操作
+                            audio = getIntent().getStringExtra("audio");
+                            Log.d(TAG, "run: audio "+audio);
+                            Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
+                            intent1.putExtra("ms","上传成功");
+                            intent1.putExtra("vp",outfilePath);
+                            startActivity(intent1);
                             dialog.dismiss();//5秒钟后，调用dismiss方法关闭进度对话框
                         } catch (Exception e) {
                             // TODO: handle exception
@@ -304,46 +302,4 @@ public class DeployVideoActivity extends BaseActivity {
         return null;
     }
 
-
-    /**
-     * 合成视频
-     * @param audio 音频路径
-     * @param outfilePath 输出路径
-     */
-    public void composeVideo(String audio, final String outfilePath){
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        Log.d(TAG, "composeVideo: ");
-        EpEditor.music(videoPath,audio , outfilePath, 0, 1, new OnEditorListener() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "onClick: 视频合成成功，开始跳转");
-                            Intent intent1 = new Intent(DeployVideoActivity.this,CameraActivity.class);
-                            intent1.putExtra("ms","上传成功");
-                            intent1.putExtra("vp",outfilePath);
-                            startActivity(intent1);
-            }
-
-            @Override
-            public void onFailure() {
-                Log.d(TAG, "onFailure: 转换视频失败");
-            }
-            @Override
-            public void onProgress(float progress) {
-                Log.d(TAG, "onProgress: "+progress);
-                //这里获取处理进度
-            }
-        });
-    }
 }

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -15,9 +16,20 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.VideoView;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import VideoHandle.EpEditor;
+import VideoHandle.OnEditorListener;
 import zippler.cn.yuewu.R;
 import zippler.cn.yuewu.listener.OnSeekBarChangeListener;
 import zippler.cn.yuewu.util.BaseActivity;
@@ -26,6 +38,8 @@ import zippler.cn.yuewu.util.FileUtil;
 public class PreviewRecordVideoActivity extends BaseActivity {
 
     private static final String TAG = "preview activity";
+    final String outfilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "yuewu"+File.separator + "乐舞_test.mp4";
+
 
     private VideoView videoView;
     private ImageButton back;
@@ -134,12 +148,27 @@ public class PreviewRecordVideoActivity extends BaseActivity {
                 dialog.show();
                 break;
             case R.id.next_button:
+                videoView.pause();
+                File file = new File(outfilePath);
+                if(file.exists()){
+                    FileUtil.deleteFile(outfilePath);
+                }
                 //跳转到发布页面
-                Intent intent = new Intent(this,DeployVideoActivity.class);
-                intent.putExtra("videoPath",path);//此路径应为裁剪后的视频路径，将裁剪前视频删除
-                Log.d(TAG, "onClick: 跳转到发布页面. length "+duration);
-                intent.putExtra("duration",duration+"");
-                startActivity(intent);
+                final ProgressDialog dialog = ProgressDialog.show(this,
+                        "正在上传", "请稍后....", true);//创建一个进度对话框
+                new Thread(new Runnable() {//使用Runnable代码块创建了一个Thread线程
+                    @Override
+                    public void run() {//run()方法中的代码将在一个单独的线程中执行
+                        // TODO Auto-generated method stub
+                        try {
+                             String audio = upload(path);
+                             composeVideo(audio,outfilePath,dialog);
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
                 break;
             case R.id.back_button:
                 exit();
@@ -202,4 +231,144 @@ public class PreviewRecordVideoActivity extends BaseActivity {
             }
         }, 5, 100);
     }
+
+
+    public String upload(String videoPath){
+        String audio;
+        try {
+            String jsonString = upLoadByCommonPost(videoPath);
+            if (jsonString!=null){
+                int type = Integer.parseInt(String.valueOf(jsonString.charAt(jsonString.lastIndexOf("}")-1)));
+                Log.d(TAG, "onClick: 上传成功");
+                switch (type){
+                    case 0:
+                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"style.mp3";
+                        break;
+                    case 1:
+                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"panama.mp3";
+                        break;
+                    case 2:
+                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"seve.mp3";
+                        break;
+                    case 3:
+                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"hongyan.mp3";
+                        break;
+                    default:
+                        audio = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)+ File.separator +"seve.mp3";
+                        break;
+                }
+
+                Log.d(TAG, "onClick: "+getIntent().getStringExtra("duration"));
+                //等待返回结果
+                File file = new File(audio);
+                Log.d(TAG, "onClick: 音频文件 ： "+file.exists());
+                File file2 = new File(videoPath);
+                Log.d(TAG, "onClick: 视频文件 ： "+file2.exists());
+
+                return audio;
+            }
+        } catch (IOException e) {
+            Log.d(TAG, "onClick: 上传失败");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String upLoadByCommonPost(String videoPath) throws IOException {
+        String end = "\r\n";
+        String twoHyphens = "--";
+        String boundary = "******";
+        URL url = new URL("http://121.196.220.121/");
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url
+                .openConnection();
+        httpURLConnection.setChunkedStreamingMode(128 * 1024);// 128K
+        // 允许输入输出流
+        httpURLConnection.setDoInput(true);
+        httpURLConnection.setDoOutput(true);
+        httpURLConnection.setUseCaches(false);
+        // 使用POST方法
+        httpURLConnection.setRequestMethod("POST");
+        httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
+        httpURLConnection.setRequestProperty("Charset", "UTF-8");
+        httpURLConnection.setRequestProperty("Content-Type",
+                "multipart/form-data;boundary=" + boundary);
+
+        DataOutputStream dos = new DataOutputStream(
+                httpURLConnection.getOutputStream());
+        dos.writeBytes(twoHyphens + boundary + end);
+        dos.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\""
+                + videoPath.substring(videoPath.lastIndexOf("/") + 1) + "\"" + end);
+        dos.writeBytes(end);
+
+        FileInputStream fis = new FileInputStream(videoPath);
+        byte[] buffer = new byte[8192]; // 8k
+        int count = 0;
+        // 读取文件
+        while ((count = fis.read(buffer)) != -1) {
+            dos.write(buffer, 0, count);
+        }
+        fis.close();
+        dos.writeBytes(end);
+        dos.writeBytes(twoHyphens + boundary + twoHyphens + end);
+        dos.flush();
+        InputStream is = httpURLConnection.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is, "utf-8");
+        BufferedReader br = new BufferedReader(isr);
+        String result ="";
+        String temp;
+        while((temp = br.readLine())!=null){
+            result+= temp;
+        }
+        Log.d(TAG, "uploadFile: "+result);
+        dos.close();
+        is.close();
+
+        return result;
+    }
+
+
+    /**
+     * 合成视频
+     * @param audio 音频路径
+     * @param outfilePath 输出路径
+     */
+    public void composeVideo(String audio, final String outfilePath,final ProgressDialog dialog){
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        Log.d(TAG, "composeVideo: ");
+        EpEditor.music(path,audio , outfilePath, 0, 1, new OnEditorListener() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "onClick: 视频合成成功，开始跳转");
+                dialog.dismiss();//5秒钟后，调用dismiss方法关闭进度对话框
+                Intent intent1 = new Intent(PreviewRecordVideoActivity.this,DeployVideoActivity.class);
+                intent1.putExtra("ms","上传成功");
+                intent1.putExtra("videoPath",outfilePath);
+                intent1.putExtra("duration",duration+"");
+                startActivity(intent1);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(TAG, "onFailure: 转换视频失败");
+            }
+            @Override
+            public void onProgress(float progress) {
+                Log.d(TAG, "onProgress: "+progress);
+                //这里获取处理进度
+            }
+        });
+    }
+
 }

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.transition.ChangeImageTransform;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.VideoView;
@@ -61,7 +62,13 @@ public class FullPreviewVideoActivity extends BaseActivity {
             }
         });
 
-        videoView.setOnClickListener(this);
+        videoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                finish();
+                return false;
+            }
+        });
     }
 
     @Override
